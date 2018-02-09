@@ -31,7 +31,7 @@ async def on_ready():
 @client.command()
 async def ping(*args):
 
-	await client.say(":ping_pong: Pong!35")
+	await client.say(":ping_pong: Pong!")
 # After you have modified the code, feel free to delete the line above so it does not keep popping up everytime you initiate the ping commmand.
 
 @client.command()
@@ -44,39 +44,47 @@ async def update():
     numname = len(content)
     for x in range(0, numname):
         summs = content[x]
+        stats = ['Name', 'tierRank', 'LeaguePoints', 'winratio', 'wins', 'losses']
         # Pull HTML from op.gg if on NA
         whosite = 'http://na.op.gg/summoner/userName=' + summs
         page = requests.get(whosite)
         # turn into goodo boyo tree
         tree = html.fromstring(page.content)
-        #mmr = tree.xpath('//span[@td="MMR"]/text()')
-        #mmr = mmr[0]
-        # Tell me rank boyo
-        rank = tree.xpath('//span[@class="tierRank"]/text()')
-        # format the list item as a str
-        rank = rank[0]
-        # Tell me LP
-        lp = tree.xpath('//span[@class="LeaguePoints"]/text()')
-        if len(lp) > 0:
-            # remove whitespace
-            lp = lp[0].strip()
-            # tell me win rate stuffs
-            # pull wr
-            wr = tree.xpath('//span[@class="winratio"]/text()')
-            wr = wr[0]
-            # pull wins and losses
-            wins = tree.xpath('//span[@class="wins"]/text()')
-            lose = tree.xpath('//span[@class="losses"]/text()')
-            wins = wins[0]
-            lose = lose[0]
-            # print it
-            final = summs + '\n'  + rank + ", " + lp + ", " + wr + ", " + wins + ", " + lose
+        # Tell me name and rank
+        for v in range(0, 2):
+            si = tree.xpath('//span[@class="' + stats[v] + '"]/text()')
+            si = si[0]
+            stats[v] = si
+        # check if lp exists/ if not: break
+        si = tree.xpath('//span[@class="' + 'LeaguePoints' + '"]/text()')
+        if len(si) < 1:
+            await client.say(', '.join(stats[0:2])+', what a casual')
+            havelp = False
         else:
-            final = summs + '\n'  + rank + ', ' + 'what a casual'
-        await client.say(final)
+            havelp = True
+        # pull stuff if they have lp like wins, and so on
+        if havelp == True:
+            for v in range(2, 6):
+                # grab var as a list from website
+                si = tree.xpath('//span[@class="' + stats[v] + '"]/text()')
+                # turn the list grabbed earlier into a str
+                si = si[0]
+                # put str into the main list (stats)
+                stats[v] = si
+            # push stats onto discord
+            stats = list(map(str.strip, stats))
+            await client.say(', '.join(stats))
     f.close()
-
-
+#listens for the thingy
+@client.command(pass_context=True)
+async def mention(ctx):
+    message = ctx.message
+    await client.say(message.content)
+    wow = str(message.content)
+    wow = wow.lstrip('~mention ')
+    who = message.server.name
+    await client.say(wow)
+    await client.say(who)
 client.run('TOKEN')
 
 # Basic Bot was created by Habchy#1665
