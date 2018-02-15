@@ -58,7 +58,7 @@ async def update():
         # check if lp exists/ if not: break
         si = tree.xpath('//span[@class="' + 'LeaguePoints' + '"]/text()')
         if len(si) < 1:
-            await client.say(', '.join(stats[0:2])+', what a casual')
+            await client.say('```'+', '.join(stats[0:2])+', what a casual'+'```')
             havelp = False
         else:
             havelp = True
@@ -73,19 +73,25 @@ async def update():
                 stats[v] = si
             # push stats onto discord
             stats = list(map(str.strip, stats))
-            await client.say(', '.join(stats))
+            await client.say('```'+', '.join(stats)+'```')
     f.close()
 #listens for the thingy
 @client.command(pass_context=True)
-async def mention(ctx):
+async def addsumm(ctx):
+    #pull msg
     message = ctx.message
+    #say the msg
     await client.say(message.content)
     wow = str(message.content)
-    wow = wow.lstrip('~mention ')
+    #pull only user input
+    wow = wow.lstrip('~addsumm ')
+    #pull server name
     who = message.server.name
+    #spit out
     await client.say(wow)
     await client.say(who)
-client.run('TOKEN')
+
+client.run('Token')
 
 # Basic Bot was created by Habchy#1665
 # Please join this Discord server if you need help: https://discord.gg/FNNNgqb
